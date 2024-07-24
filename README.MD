@@ -13,6 +13,9 @@
 - **.gitignore**: Git ignore file
 - **manage.py**: Django management script
 - **requirements.txt**: Python dependencies
+- **Documentation.pdf**: Documentation of the project
+- **.env.example**: The example of .env file
+- **utils**: Folder for utility scripts
 - **README.md**: Project README file
 
 
