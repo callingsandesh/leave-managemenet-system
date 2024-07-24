@@ -29,9 +29,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-xq=%ur=p)np#j!7akv8qfag1*#2oru97+own)k&@56k#6o*2y5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 REST_FRAMEWORK = {
@@ -93,7 +93,7 @@ INSTALLED_APPS = [
     'user',
     'visualizations',
     # Third-party apps
-    #'rest_framework',  # Add this line to include Django REST Framework
+    'rest_framework',  # Add this line to include Django REST Framework
     'django_plotly_dash.apps.DjangoPlotlyDashConfig',  # If using Plotly Dash for visualizations
     'rest_framework_simplejwt'  #JWT authentication
 ]

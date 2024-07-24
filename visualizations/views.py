@@ -11,14 +11,12 @@ def employee_count_by_designation_view(request):
 
 def employee_count_by_designation(request):
     department = request.GET.get('department')
-    print("department", department)
     if department == 'all':
         query = """SELECT d.name, COUNT(e.id) 
                 FROM apidataupload_employee e 
                 JOIN apidataupload_designation d ON e.designation_id = d.id 
                 GROUP BY d.name"""
         params = []
-        print("Inside IF")
     else:
         #query = "SELECT designation, COUNT(*) as count FROM employee WHERE department = %s GROUP BY designation"
         query="""SELECT d.name, COUNT(e.id) 
@@ -27,14 +25,12 @@ def employee_count_by_designation(request):
                 WHERE e.department_description = %s 
                 GROUP BY d.name"""
         params=[department]
-        print("Inside Else")
         
     with connection.cursor() as cursor:
         cursor.execute(query, params)
         rows = cursor.fetchall()
     
     data = [{'designation': row[0], 'count': row[1]} for row in rows]
-    print(data)
     return JsonResponse(data, safe=False)
 
 def leave_type_distribution(request):
@@ -92,12 +88,11 @@ def employee_leave_trend(request):
     data = [{'label': row[0], 'count': row[1]} for row in rows]
     return JsonResponse(data, safe=False)
 
-
+@login_required
 def d3_visualization(request):
-    print("I am here")
     return render(request, 'visualizations/d3_visualization.html')
 
-#@csrf_exempt  # Optional: Exempt CSRF protection if necessary (e.g., for external calls)
+@login_required
 def leave_heatmap_api(request):
     start_date = request.GET.get('start_date', '2023-01-01')
     end_date = request.GET.get('end_date', '2024-12-31')
@@ -127,5 +122,4 @@ def leave_heatmap_api(request):
         }
         for row in heatmap_data
     ]
-    print(data)
     return JsonResponse(data, safe=False)

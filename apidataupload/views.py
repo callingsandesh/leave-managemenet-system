@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 import pandas as pd
 from .forms import UploadFileForm
 import numpy as np
-from rest_framework.decorators import api_view, permission_classes
+#from rest_framework.decorators import api_view, permission_classes
 #from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.decorators import login_required
 from django.db import connection
@@ -175,7 +175,6 @@ async def handle_api_data(request):
         file_paths_list = SQL_FILE_PATHS.split(',') # Convert the string into a list by splitting it by commas     
         base_url = os.getenv('BASE_URL')    
         sql_queries=[read_sql_file(base_url+file_path) for file_path in file_paths_list]
-        #print(sql_queries[0])
         tasks = [call_stored_proc_async(sql_query, aware_datetime) for sql_query in sql_queries]
             
         await asyncio.gather(*tasks) # Run all tasks concurrently
@@ -187,7 +186,6 @@ async def handle_api_data(request):
 @async_to_sync
 @login_required
 async def upload_file(request):
-    print("Inside upload_file")
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
@@ -201,8 +199,6 @@ async def upload_file(request):
             createdat_db=datetime.datetime.today()
             timezone = pytz.timezone('Asia/Kathmandu')  # Set your desired timezone here
             aware_datetime = timezone.localize(createdat_db)
-            print(createdat_db)
-            print(aware_datetime)
             tasks = [save_chunk(chunk,aware_datetime) for chunk in chunks]
             await asyncio.gather(*tasks)
             end_time = time.time()
@@ -215,8 +211,6 @@ async def upload_file(request):
             base_url = os.getenv('BASE_URL')
             
             sql_queries=[read_sql_file(base_url+file_path) for file_path in file_paths_list]
-
-            #print(sql_queries[0])
             tasks = [call_stored_proc_async(sql_query, aware_datetime) for sql_query in sql_queries]
             
             await asyncio.gather(*tasks) # Run all tasks concurrently

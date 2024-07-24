@@ -13,7 +13,7 @@ class LeaveType(models.Model):
     leave_type = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return self.leave_type
 
 
 class Employee(models.Model):

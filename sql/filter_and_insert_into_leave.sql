@@ -1,6 +1,5 @@
-
-    -- Insert filtered results from source_table to destination_table
-   MERGE INTO apidataupload_leave as l
+-- Insert filtered results from source_table to destination_table
+MERGE INTO apidataupload_leave as l
 										USING
 									(SELECT DISTINCT 
 									"id_s",
@@ -29,7 +28,7 @@
 									"isAutomated",
 									"isConverted"
 						FROM apidataupload_employeeleave el
-    WHERE el."createdat_db" >=  %s
+   WHERE el."createdat_db" >=  %s
 									) a	
 									ON l."id" = a."id_s"
 									WHEN NOT MATCHED THEN
