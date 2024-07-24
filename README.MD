@@ -1,7 +1,7 @@
 
 ### Description of Each Folder
 
-#### LEAVE-MANAGEMENT-SYSTEM/
+#### leave-management-system/
 - **leavemgt/**: Django project for Leave Management
 - **apidataupload/**: Django app for API data upload
 - **user/**: Django app for JWT Authentication
@@ -20,7 +20,7 @@
 
 
 
-# Getting Started with LEAVE-MANAGEMENT-SYSTEM
+# Getting Started with leave-management-system
 
 This guide will walk you through the steps to create a new user and access the login page for the LEAVE-MANAGEMENT-SYSTEM Django project.
 
