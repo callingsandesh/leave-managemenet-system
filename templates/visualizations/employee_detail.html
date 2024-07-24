@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Employee Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .title, .subtitle {
+            text-align: center;
+            color: #333;
+        }
+        .employee-info {
+            margin: 20px 0;
+        }
+        .employee-info p {
+            margin: 5px 0;
+        }
+        .leave-list {
+            list-style: none;
+            padding: 0;
+        }
+        .leave-item {
+            background: #f9f9f9;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        strong {
+            color: #333;
+        }
+        em {
+            color: #666;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+        }
+    </style>
+    <script>
+        function searchLeaves() {
+            const input = document.getElementById('search-input');
+            const filter = input.value.toLowerCase();
+            const leaveItems = document.querySelectorAll('.leave-item');
+            
+            leaveItems.forEach((item) => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(filter)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    {% include 'header.html' %}
+    <div class="container">
+        <h1 class="title">{{ employee.first_name }} {{ employee.last_name }}</h1>
+        <div class="employee-info">
+            <p><strong>Email:</strong> {{ employee.email }}</p>
+            <p><strong>Department:</strong> {{ employee.department_description }}</p>
+            <p><strong>Designation:</strong> {{ employee.designation }}</p>
+        </div>
+        <h2 class="subtitle">Leave Information</h2>
+        <input type="text" id="search-input" class="form-control search-bar" onkeyup="searchLeaves()" placeholder="Search by leave status...">
+        <ul class="leave-list">
+            {% for leave in leaves %}
+                <li class="leave-item">
+                    <strong>{{ leave.leave_type.leave_type }}:</strong> {{ leave.start_date }} to {{ leave.end_date }} - <em>Status:</em> {{ leave.status }}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% include 'footer.html' %}
+</body>
+</html>

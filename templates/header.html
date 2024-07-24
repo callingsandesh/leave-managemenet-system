@@ -1,0 +1,17 @@
+<!-- templates/header.html -->
+<header>
+    <nav style="background-color: #333; padding: 10px; text-align: center;">
+        <a href="/dataupload/" style="color: #fff; margin: 0 15px; text-decoration: none;">Home</a>
+        <a href="/dataupload/upload/" style="color: #fff; margin: 0 15px; text-decoration: none;">Upload</a>
+        <a href="/dataupload/navigation/" style="color: #fff; margin: 0 15px; text-decoration: none;">API</a>
+        <a href="/visualizations/employee-count-by-designation-view/" style="color: #fff; margin: 0 15px; text-decoration: none;">Visualizations</a>
+        <a href="/visualizations/employees/" style="color: #fff; margin: 0 15px; text-decoration: none;">Employees</a>
+        <a href="/visualizations/d3_visualization/" style="color: #fff; margin: 0 15px; text-decoration: none;">D3 Visualization</a>
+        {% if user.is_authenticated %}
+            <a href="/user/logout/" style="color: #fff; margin: 0 15px; text-decoration: none;">Logout</a>
+        {% else %}
+            <a href="/user/login/" style="color: #fff; margin: 0 15px; text-decoration: none;">Login</a>
+        {% endif %}
+    </nav>
+</header>
+

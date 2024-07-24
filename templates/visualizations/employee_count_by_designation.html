@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Visualizations</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .chart-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+        }
+        .chart-box {
+            flex: 0 0 48%; /* Adjust the width of each box */
+            margin: 10px; /* Add some margin for spacing */
+            border: 1px solid #ddd;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        canvas {
+            width: 100% !important;
+            height: 400px !important; /* Adjust height for better visibility */
+        }
+        .full-width-chart {
+            width: 100%;
+            margin: 10px 0; /* Add some margin for spacing */
+            border: 1px solid #ddd;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .date-filter {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'header.html' %}
+    <div class="container mt-5">
+        <div class="chart-container">
+            <div class="chart-box">
+                <h2>Employee Count by Designation</h2>
+                <div class="form-group">
+                    <label for="departmentSelect">Filter by Department:</label>
+                    <select id="departmentSelect" class="form-control" onchange="updateChartbar()">
+                        <option value="all">All Departments</option>
+                        <option value="Human Resource">HR</option>
+                        <option value="Administration Team">Administration Team</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Sales Team">Sales</option>
+                        <option value="All the support Staffs falls under this Operatoin">Support Staffs</option>
+                        <!-- Add more departments as needed -->
+                    </select>
+                </div>
+                <canvas id="employeeChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <h2>Leave Type Distribution</h2>
+                <canvas id="leaveTypeChart"></canvas>
+            </div>
+        </div>
+        <div class="full-width-chart">
+            <div class="date-filter">
+                <div class="form-group">
+                    <label for="startDate">Start Date:</label>
+                    <input type="date" id="startDate" class="form-control" onchange="updatechartline()">
+                </div>
+                <div class="form-group">
+                    <label for="endDate">End Date:</label>
+                    <input type="date" id="endDate" class="form-control" onchange="updatechartline()">
+                </div>
+            </div>
+            <h2>Daily Leave Count Of All Department</h2>
+            <canvas id="lineChart"></canvas>
+        </div>
+    </div>
+    <script>
+        async function fetchData(url) {
+            const response = await fetch(url);
+            const data = await response.json();
+            return data;
+        }
+
+        function renderBarChart(data, canvasId, label) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const labels = data.map(item => item.label);
+            const counts = data.map(item => item.count);
+            if (window[canvasId] instanceof Chart) {
+                window[canvasId].destroy();
+            }
+            window[canvasId] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: counts,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateColors(numColors) {
+            const colors = [];
+            for (let i = 0; i < numColors; i++) {
+                const r = Math.floor(Math.random() * 255);
+                const g = Math.floor(Math.random() * 255);
+                const b = Math.floor(Math.random() * 255);
+                colors.push(`rgba(${r}, ${g}, ${b}, 0.5)`);
+            }
+            return colors;
+        }
+
+        function renderdoughnutChart(data, canvasId, label) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const labels = data.map(item => item.label);
+            const counts = data.map(item => item.count);
+
+            // Find the indices of the max and min counts
+            const maxCount = Math.max(...counts);
+            const minCount = Math.min(...counts);
+            const maxIndex = counts.indexOf(maxCount);
+            const minIndex = counts.indexOf(minCount);
+            
+            const colors = generateColors(counts.length);
+
+            // Assign green to the max and red to the min
+            colors[maxIndex] = 'rgba(0, 255, 0, 0.5)'; // Green for max
+            colors[minIndex] = 'rgba(255, 0, 0, 0.5)'; // Red for min
+
+            if (window[canvasId] instanceof Chart) {
+                window[canvasId].destroy();
+            }
+            window[canvasId] = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: counts,
+                        backgroundColor: colors,
+                        borderColor: 'rgba(255, 255, 255, 1)',
+                        borderWidth: 1
+                    }]
+                }
+            });
+        }
+
+        function renderLineChart(data, canvasId, label) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const labels = data.map(item => item.label);
+            const counts = data.map(item => item.count);
+            if (window[canvasId] instanceof Chart) {
+                window[canvasId].destroy();
+            }
+            window[canvasId] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: counts,
+                        fill: false,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        tension: 0.1
+                    }]
+                }
+            });
+        }
+        function setDefaultDates() {
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(endDate.getDate() - 14); // Set start date to 2 weeks before end date
+
+            const formatDate = date => date.toISOString().split('T')[0]; // Format date as yyyy-mm-dd
+
+            document.getElementById('startDate').value = formatDate(startDate);
+            document.getElementById('endDate').value = formatDate(endDate);
+        }
+
+        async function updateChartbar() {
+            console.log("inside updateChartbar before")
+            const department = document.getElementById('departmentSelect').value;
+            fetchData(`/visualizations/employee-count-by-designation/?department=${encodeURIComponent(department)}`).then(employeeData => {
+                const employeeChartData = employeeData.map(item => ({ label: item.designation, count: item.count }));
+                renderBarChart(employeeChartData, 'employeeChart', 'Employee Count');
+                console.log("rendered 1")
+            }).catch(err => {    
+            });
+            console.log("inside updateChartbar after")
+
+
+        }
+        async function updatechartdoughnut(){
+            console.log("inside updatechartdoughnut before")
+            fetchData(`/visualizations/leave_type_distribution/`).then(leaveTypeData => {
+                renderdoughnutChart(leaveTypeData, 'leaveTypeChart', 'Leave Type Distribution');
+                console.log("rendered 2")
+            }).catch(err => {    
+            });
+            console.log("inside updatechartdoughnut after")
+        }
+        async function updatechartline(){
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            let url = '/visualizations/employee_leave_trend/';
+            if (startDate && endDate) {
+                url += `?start_date=${startDate}&end_date=${endDate}`;
+            } else if (startDate) {
+                url += `?start_date=${startDate}`;
+            } else if (endDate) {
+                url += `?end_date=${endDate}`;
+            }
+            console.log("inside updatechartline before")
+            
+            fetchData(url).then(overallData => {
+                renderLineChart(overallData, 'lineChart', 'Overall Data Trend');
+                console.log("rendered 3")
+            }).catch(err => {    
+            });
+            console.log("inside updatechartline after")
+        }
+
+        // Initial chart rendering
+        console.log("1");
+        updateChartbar();
+        console.log("2");
+        updatechartdoughnut();
+        console.log("3");
+
+        setDefaultDates()
+        updatechartline();
+
+    </script>
+    {% include 'footer.html' %}
+</body>
+</html>

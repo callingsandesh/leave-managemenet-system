@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leave Heatmap</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .cell {
+            stroke: #fff;
+            stroke-width: 1px;
+        }
+        .axis text {
+            font: 10px sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>Leave Heatmap</h1>
+    <div id="heatmap"></div>
+    <script>
+        // Set dimensions and margins
+        const margin = {top: 20, right: 20, bottom: 30, left: 40},
+              width = 960 - margin.left - margin.right,
+              height = 500 - margin.top - margin.bottom;
+
+        const parseDate = d3.timeParse("%Y-%m-%d");
+
+        const svg = d3.select("#heatmap").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        // Load data from the API
+        d3.json('/visualization/leave-heatmap/').then(data => {
+            // Prepare data
+            data.forEach(d => {
+                d.date = parseDate(d.date);
+                d.leave_count = +d.leave_count;
+            });
+
+            // Define the color scale
+            const colorScale = d3.scaleSequential(d3.interpolateYlOrRd)
+                .domain([0, d3.max(data, d => d.leave_count)]);
+
+            // Create the x and y scales
+            const xScale = d3.scaleTime()
+                .domain(d3.extent(data, d => d.date))
+                .range([0, width]);
+
+            const yScale = d3.scaleBand()
+                .domain(d3.range(1, 32)) // Days of the month
+                .range([height, 0])
+                .padding(0.05);
+
+            // Create x and y axes
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(xScale).ticks(d3.timeMonth.every(1)).tickFormat(d3.timeFormat("%b %Y")));
+
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(d3.axisLeft(yScale).tickFormat(d => d + 1));
+
+            // Create heatmap cells
+            svg.selectAll(".cell")
+                .data(data)
+                .enter().append("rect")
+                .attr("class", "cell")
+                .attr("x", d => xScale(d.date))
+                .attr("y", d => yScale(d.date.getDate()))
+                .attr("width", width / d3.timeMonth.count(d3.min(data, d => d.date), d3.max(data, d => d.date)))
+                .attr("height", yScale.bandwidth())
+                .style("fill", d => colorScale(d.leave_count))
+                .append("title")
+                .text(d => `Date: ${d3.timeFormat("%Y-%m-%d")(d.date)}\nLeave Count: ${d.leave_count}`);
+        });
+    </script>
+</body>
+</html>

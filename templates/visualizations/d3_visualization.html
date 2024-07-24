@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leave Calendar Chart</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .day {
+            stroke: #fff;
+            stroke-width: 1px;
+        }
+        .month {
+            fill: none;
+            stroke: #000;
+            stroke-width: 2px;
+        }
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            width: auto;
+            height: auto;
+            padding: 2px;
+            font: 12px sans-serif;
+            background: lightsteelblue;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+        .legend {
+            font-size: 12px;
+        }
+        .legend rect {
+            stroke-width: 2;
+            stroke: #999;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    {% include 'header.html' %}
+    <div class="container">
+        <div>
+            <h1>Leave Calendar Chart</h1>
+            <div id="calendarChart"></div>
+            <div id="legend"></div>
+        </div>
+    </div>
+    <script>
+        // Set dimensions and margins
+        const margin = {top: 40, right: 20, bottom: 30, left: 60},
+              width = 960 - margin.left - margin.right,
+              height = 136 - margin.top - margin.bottom,
+              cellSize = 17;
+
+        const formatDay = d3.timeFormat("%w"),
+              formatWeek = d3.timeFormat("%U"),
+              parseDate = d3.timeParse("%Y-%m-%d"),
+              formatDate = d3.timeFormat("%Y-%m-%d"),
+              color = d3.scaleSequential(d3.interpolateYlOrRd);
+
+        // Create tooltip
+        const tooltip = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+        // Function to fetch data from API
+        async function fetchData(url) {
+            try {
+                const response = await d3.json(url);
+                return response;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return [];
+            }
+        }
+
+        // Function to render the calendar chart
+        function renderChart(data) {
+            const nestedData = d3.groups(data, d => new Date(d.date).getFullYear());
+            const years = nestedData.map(d => d[0]);
+
+            const svg = d3.select("#calendarChart").selectAll("svg")
+                .data(years)
+                .enter().append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom + 20) // Added space for year label
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            // Prepare data
+            const dataMap = new Map(data.map(d => [formatDate(parseDate(d.date)), d.leave_count]));
+
+            color.domain([0, d3.max(data, d => d.leave_count)]);
+
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", -margin.top / 2) // Position year label above the chart, adjusted to avoid overlap
+                .attr("text-anchor", "middle")
+                .attr("font-size", "16px")
+                .attr("font-weight", "bold")
+                .text(d => d); // Add year label
+
+            svg.append("g")
+                .attr("text-anchor", "end")
+                .selectAll("text")
+                .data(d3.range(7).map(i => new Date(1995, 0, i)))
+                .enter().append("text")
+                .attr("x", -5)
+                .attr("y", d => (formatDay(d) * cellSize) + cellSize)
+                .attr("dy", "-.25em")
+                .text(d => d3.timeFormat("%A")(d).charAt(0)); // Only first letter of day name
+
+            svg.append("g")
+                .selectAll("rect")
+                .data(d => d3.timeDays(new Date(d, 0, 1), new Date(d + 1, 0, 1)))
+                .enter().append("rect")
+                .attr("class", "day")
+                .attr("width", cellSize)
+                .attr("height", cellSize)
+                .attr("x", d => formatWeek(d) * cellSize)
+                .attr("y", d => formatDay(d) * cellSize)
+                .datum(formatDate)
+                .style("fill", d => color(dataMap.get(d) || 0))
+                .on("mouseover", function(event, d) {
+                    tooltip.transition()
+                        .duration(200)
+                        .style("opacity", .9);
+                    tooltip.html(`Date: ${d}<br/>Leave Count: ${dataMap.get(d) || 0}`)
+                        .style("left", (event.pageX + 5) + "px")
+                        .style("top", (event.pageY - 28) + "px");
+                })
+                .on("mouseout", function() {
+                    tooltip.transition()
+                        .duration(500)
+                        .style("opacity", 0);
+                });
+
+            svg.append("g")
+                .selectAll("path")
+                .data(d => d3.timeMonths(new Date(d, 0, 1), new Date(d + 1, 0, 1)))
+                .enter().append("path")
+                .attr("class", "month")
+                .attr("d", monthPath);
+
+            // Add month labels
+            svg.append("g")
+                .attr("class", "month-labels")
+                .selectAll("text")
+                .data(d => d3.timeMonths(new Date(d, 0, 1), new Date(d + 1, 0, 1)))
+                .enter().append("text")
+                .attr("x", d => formatWeek(d3.timeSunday.floor(d)) * cellSize + 2)
+                .attr("y", -5)
+                .text(d3.timeFormat("%b"));
+
+            // Add legend
+            const legend = d3.select("#legend").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", 50)
+                .append("g")
+                .attr("transform", `translate(${margin.left}, 20)`);
+
+            const legendScale = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.leave_count)])
+                .range([0, width / 2]);
+
+            const legendAxis = d3.axisBottom(legendScale)
+                .ticks(6)
+                .tickSize(13);
+
+            legend.selectAll("rect")
+                .data(color.ticks(6).map(t => {
+                    return {
+                        offset: legendScale(t),
+                        color: color(t)
+                    };
+                }))
+                .enter().append("rect")
+                .attr("x", d => d.offset)
+                .attr("y", -13)
+                .attr("width", (width / 2) / 6)
+                .attr("height", 13)
+                .attr("fill", d => d.color);
+
+            legend.append("g")
+                .call(legendAxis)
+                .select(".domain")
+                .remove();
+        }
+
+        function monthPath(t0) {
+            const t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0),
+                  d0 = +formatDay(t0), w0 = +formatWeek(t0),
+                  d1 = +formatDay(t1), w1 = +formatWeek(t1);
+            return `M${(w0 + 1) * cellSize},${d0 * cellSize}H${w0 * cellSize}V${7 * cellSize}H${w1 * cellSize}V${(d1 + 1) * cellSize}H${(w1 + 1) * cellSize}V0H${(w0 + 1) * cellSize}Z`;
+        }
+
+        // Fetch data and render the chart
+        async function updateChart() {
+            fetchData(`/visualizations/leave-heatmap/`).then(data => {
+                renderChart(data);
+            }).catch(err => {    
+                console.error('Error updating chart:', err);
+            });
+        }
+
+        updateChart();
+    </script>
+    {% include 'footer.html' %}
+</body>
+</html>

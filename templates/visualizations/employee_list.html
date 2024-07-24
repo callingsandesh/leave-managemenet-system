@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Employee List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .title {
+            text-align: center;
+            color: #333;
+        }
+        .employee-list {
+            list-style: none;
+            padding: 0;
+        }
+        .employee-item {
+            background: #f9f9f9;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .employee-link {
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+        }
+        .employee-link:hover {
+            text-decoration: underline;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+        }
+    </style>
+    <script>
+        function searchEmployees() {
+            const input = document.getElementById('search-input');
+            const filter = input.value.toLowerCase();
+            const employeeItems = document.querySelectorAll('.employee-item');
+            
+            employeeItems.forEach((item) => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(filter)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    {% include 'header.html' %}
+    <div class="container">
+        <h1 class="title">Employee List</h1>
+        <input type="text" id="search-input" class="form-control search-bar" onkeyup="searchEmployees()" placeholder="Search employees...">
+        <ul class="employee-list">
+            {% for employee in employees %}
+                <li class="employee-item">
+                    <a class="employee-link" href="{% url 'employee_detail' employee.id %}">
+                        {{ employee.first_name }} {{ employee.last_name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% include 'footer.html' %}
+</body>
+</html>
