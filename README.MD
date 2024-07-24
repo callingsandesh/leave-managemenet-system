@@ -1,25 +1,20 @@
-LEAVE-MANAGEMENT-SYSTEM
-├── leavemgt/ # Django project folder
-│ ├── apidataupload/ # Django app for API data upload
-│ │ └── #
-│ ├── leavemgt/ # Django app for Leave Management
-│ │ └── #
-│ ├── user/ # Django app for JWT Authentication
-│ │ └── #
-│ └── visualization/ # Django app for Visualization
-│ └── #
-|
-├── Templates/ # Folder for Django Templates
-|
-├── SQL/ # Folder for SQL scripts
-|
-├── .gitignore # Git ignore file
-|
-├── manage.py # Django management script
-|
-├── requirements.txt # Python dependencies
-|
-└── README.md # Project README file
+
+### Description of Each Folder
+
+#### LEAVE-MANAGEMENT-SYSTEM/
+- **leavemgt/**: Django project for Leave Management
+- **apidataupload/**: Django app for API data upload
+- **user/**: Django app for JWT Authentication
+- **visualization/**: Django app for Visualization
+
+### Other Folders and Files
+- **Templates/**: Folder for Django Templates
+- **SQL/**: Folder for SQL scripts
+- **.gitignore**: Git ignore file
+- **manage.py**: Django management script
+- **requirements.txt**: Python dependencies
+- **README.md**: Project README file
+
 
 
 # Getting Started with LEAVE-MANAGEMENT-SYSTEM
