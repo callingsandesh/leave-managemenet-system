@@ -14,7 +14,6 @@ RUN apt-get update && \
     apt-get install -y gcc python3-dev build-essential && \
     pip install --upgrade pip && \
     pip install -r requirements.txt && \
-    pip install twisted-iocpsupport
     apt-get remove -y gcc python3-dev build-essential && \
     apt-get autoremove -y && \
     apt-get clean && \
