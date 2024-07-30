@@ -13,13 +13,11 @@ from dotenv import load_dotenv
 import pandas as pd
 from .forms import UploadFileForm
 import numpy as np
-#from rest_framework.decorators import api_view, permission_classes
-#from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.decorators import login_required
-from django.db import connection
+from django.db import connection,DatabaseError
 import pytz
 from utils.utils_sql import read_sql_file
-from leavemgt.settings import BASE_DIR
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -110,11 +108,16 @@ async def call_stored_proc_async(sql_query, createdat_filter):
     return await sync_to_async(call_stored_proc_sync)(sql_query, createdat_filter)
 
 def call_stored_proc_sync(sql_query, createdat_filter):
-    with connection.cursor() as cursor:
-        cursor.execute(sql_query,[createdat_filter])              
-        print("Executed")
-    pass
-
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(sql_query,[createdat_filter])              
+            print("Executed")
+    except DatabaseError as e:
+        print(f"Database error: {str(e)}")
+        return HttpResponse(f"SQL file could not be executed: {sql_query}. Error: {str(e)} .Query: {cursor.mogrify(sql_query, [createdat_filter]).decode('utf-8')}", status=500) 
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}")
+        return HttpResponse(f"An unexpected error occurred while executing: {sql_query}. Error: {str(e)}", status=500)
 
 
 
@@ -209,6 +212,7 @@ async def upload_file(request):
             createdat_db=datetime.datetime.today()
             timezone = pytz.timezone('Asia/Kathmandu')  # Set your desired timezone here
             aware_datetime = timezone.localize(createdat_db)
+            print(aware_datetime)
             tasks = [save_chunk(chunk,aware_datetime) for chunk in chunks]
             await asyncio.gather(*tasks)
             end_time = time.time()
