@@ -173,8 +173,18 @@ async def handle_api_data(request):
         #code to normalize data in raw table 
         SQL_FILE_PATHS = os.getenv('SQL_FILE_PATHS')      
         file_paths_list = SQL_FILE_PATHS.split(',') # Convert the string into a list by splitting it by commas     
-        base_url = os.getenv('BASE_URL')    
-        sql_queries=[read_sql_file(base_url+file_path) for file_path in file_paths_list]
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # Initialize an empty list to hold SQL script contents
+        sql_scripts = []
+        # Construct full paths and read each SQL file
+        for file_name in file_paths_list:
+            file_name =  file_name.strip()
+            sql_file_path = os.path.join(BASE_DIR, 'sql', file_name)
+            if os.path.exists(sql_file_path):
+                sql_scripts.append(sql_file_path)
+            else:
+                return HttpResponse(f"SQL file not found: {file_name}", status=404)  
+        sql_queries=[read_sql_file(file_path) for file_path in sql_scripts]
         tasks = [call_stored_proc_async(sql_query, aware_datetime) for sql_query in sql_queries]
             
         await asyncio.gather(*tasks) # Run all tasks concurrently
@@ -207,10 +217,19 @@ async def upload_file(request):
             SQL_FILE_PATHS = os.getenv('SQL_FILE_PATHS')
             
             file_paths_list = SQL_FILE_PATHS.split(',') # Convert the string into a list by splitting it by commas
-            
-            base_url = os.getenv('BASE_URL')
-            
-            sql_queries=[read_sql_file(base_url+file_path) for file_path in file_paths_list]
+            BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            print(BASE_DIR)
+            # Initialize an empty list to hold SQL script contents
+            sql_scripts = []
+            # Construct full paths and read each SQL file
+            for file_name in file_paths_list:
+                file_name =  file_name.strip()
+                sql_file_path = os.path.join(BASE_DIR, 'sql', file_name)
+                if os.path.exists(sql_file_path):
+                    sql_scripts.append(sql_file_path)
+                else:
+                    return HttpResponse(f"SQL file not found: {file_name}", status=404)  
+            sql_queries=[read_sql_file(file_path) for file_path in sql_scripts]
             tasks = [call_stored_proc_async(sql_query, aware_datetime) for sql_query in sql_queries]
             
             await asyncio.gather(*tasks) # Run all tasks concurrently
