@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from apidataupload.models import Employee , Leave 
 from datetime import datetime, timedelta
 
-@login_required(login_url='/user/login/')
+@login_required
 def employee_count_by_designation_view(request):
     return render(request, 'visualizations/employee_count_by_designation.html')
 
@@ -18,7 +18,6 @@ def employee_count_by_designation(request):
                 GROUP BY d.name"""
         params = []
     else:
-        #query = "SELECT designation, COUNT(*) as count FROM employee WHERE department = %s GROUP BY designation"
         query="""SELECT d.name, COUNT(e.id) 
                 FROM apidataupload_employee e 
                 JOIN apidataupload_designation d ON e.designation_id = d.id
@@ -34,8 +33,6 @@ def employee_count_by_designation(request):
     return JsonResponse(data, safe=False)
 
 def leave_type_distribution(request):
-    #leave_type = request.GET.get('department')
-   
     query = """SELECT lt.leave_type , count(l.id)  FROM apidataupload_leave l
 				JOIN apidataupload_leavetype lt ON l.leave_type_id = lt.id
 				GROUP BY lt.leave_type"""     
@@ -56,7 +53,6 @@ def employee_detail(request, employee_id):
     employee = get_object_or_404(Employee, id=employee_id)
     leaves = Leave.objects.filter(employee=employee)
     return render(request, 'visualizations/employee_detail.html', {'employee': employee, 'leaves': leaves})
-
 
 @login_required
 def employee_leave_trend(request):

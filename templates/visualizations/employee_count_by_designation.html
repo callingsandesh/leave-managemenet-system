@@ -193,7 +193,7 @@
         async function updateChartbar() {
             console.log("inside updateChartbar before")
             const department = document.getElementById('departmentSelect').value;
-            fetchData(`/visualizations/employee-count-by-designation/?department=${encodeURIComponent(department)}`).then(employeeData => {
+            fetchData(`/api/v1/visualizations/employee-count-by-designation/?department=${encodeURIComponent(department)}`).then(employeeData => {
                 const employeeChartData = employeeData.map(item => ({ label: item.designation, count: item.count }));
                 renderBarChart(employeeChartData, 'employeeChart', 'Employee Count');
                 console.log("rendered 1")
@@ -205,7 +205,7 @@
         }
         async function updatechartdoughnut(){
             console.log("inside updatechartdoughnut before")
-            fetchData(`/visualizations/leave_type_distribution/`).then(leaveTypeData => {
+            fetchData(`/api/v1/visualizations/leave_type_distribution/`).then(leaveTypeData => {
                 renderdoughnutChart(leaveTypeData, 'leaveTypeChart', 'Leave Type Distribution');
                 console.log("rendered 2")
             }).catch(err => {    
@@ -215,7 +215,7 @@
         async function updatechartline(){
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
-            let url = '/visualizations/employee_leave_trend/';
+            let url = '/api/v1/visualizations/employee_leave_trend/';
             if (startDate && endDate) {
                 url += `?start_date=${startDate}&end_date=${endDate}`;
             } else if (startDate) {

@@ -19,7 +19,7 @@ def login_view(request):
         if user is not None:
             login(request, user)
             refresh = RefreshToken.for_user(user)
-            response = redirect('/dataupload/')  # Make sure the redirect URL is correct
+            response = redirect('/api/v1/dataupload/')  # Make sure the redirect URL is correct
             response.set_cookie('access', str(refresh.access_token))
             response.set_cookie('refresh', str(refresh))
             return response

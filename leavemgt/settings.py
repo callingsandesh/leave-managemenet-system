@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-xq=%ur=p)np#j!7akv8qfag1*#2oru97+own)k&@56k#6o*2y5'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG')
@@ -42,14 +42,14 @@ REST_FRAMEWORK = {
 
 
 # settings.py
-LOGIN_URL = '/user/login/'
-LOGIN_REDIRECT_URL = '/dataupload/'
-LOGOUT_REDIRECT_URL = '/user/login/'
+LOGIN_URL = '/api/v1/user/login/'
+LOGIN_REDIRECT_URL = '/api/v1/dataupload/'
+LOGOUT_REDIRECT_URL = '/api/v1/user/login/'
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=50),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
@@ -79,24 +79,28 @@ SIMPLE_JWT = {
 }
 
 # Application definition
-
-INSTALLED_APPS = [
+DEFAULT_APP = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    #our app
+    'django.contrib.staticfiles'
+]
+
+OUR_APP = [
     'leavemgt',
     'apidataupload',
     'user',
-    'visualizations',
-    # Third-party apps
-    'rest_framework',  # Add this line to include Django REST Framework
-    'django_plotly_dash.apps.DjangoPlotlyDashConfig',  # If using Plotly Dash for visualizations
-    'rest_framework_simplejwt'  #JWT authentication
+    'visualizations'
 ]
+
+
+THIRD_PARTY_APP = [
+    'rest_framework_simplejwt'
+]
+
+INSTALLED_APPS = DEFAULT_APP + OUR_APP + THIRD_PARTY_APP
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -25,11 +25,9 @@ load_dotenv()
 def navigation(request):
     return render(request, 'navigation.html')
 
-
 @login_required
 def index(request):
     return render(request, 'index.html')
-
 
 def chunk_data(data, chunk_size):
     """Split data into chunks of specified size."""
@@ -40,7 +38,6 @@ async def save_chunk(chunk,createdat_db):
     """Save a chunk of data to the database asynchronously."""
     instances = [create_employee_leave_instance(item,createdat_db) for item in chunk]
     await sync_to_async(EmployeeLeave.objects.bulk_create)(instances)
-
 
 async def fetch_data_for_interval(base_url, headers, interval_start, interval_end):
     """Fetch data for a specific date interval."""
@@ -77,8 +74,6 @@ def handle_uploaded_file(file):
     data = data.to_dict(orient='records')
     return data
 
-
-
 def handle_uploaded_file(file):
     # Determine file type and parse accordingly
     if file.name.endswith('.csv'):
@@ -103,7 +98,6 @@ def call_stored_proc_to_normalize_data(procedurename,filter_datetime):
     # Process results as needed and return an appropriate HTTP response
     return results
 
-
 async def call_stored_proc_async(sql_query, createdat_filter):
     return await sync_to_async(call_stored_proc_sync)(sql_query, createdat_filter)
 
@@ -119,10 +113,6 @@ def call_stored_proc_sync(sql_query, createdat_filter):
         print(f"Unexpected error: {str(e)}")
         return HttpResponse(f"An unexpected error occurred while executing: {sql_query}. Error: {str(e)}", status=500)
 
-
-
-#@api_view(['GET', 'POST'])
-#@permission_classes([IsAuthenticated])
 @async_to_sync
 @login_required
 async def handle_api_data(request):
@@ -131,7 +121,6 @@ async def handle_api_data(request):
         headers = {
             'Authorization': os.getenv('API_AUTHORIZATION')
         }
-
         # Extract startDate and endDate from the URL
         url_parts = list(urlparse(url))
         query = parse_qs(url_parts[4])
@@ -156,22 +145,18 @@ async def handle_api_data(request):
                 data.extend(result['data'])
             else:
                 print(f"Error fetching data: {result}")
-
-
         print(f"Fetching data took: {end_time - start_time} seconds")
         createdat_db=datetime.datetime.today()
         timezone = pytz.timezone('Asia/Kathmandu')  # Set your desired timezone here
         aware_datetime = timezone.localize(createdat_db)
         # Define chunk size
         chunk_size = 30000  # Adjust this size based on your needs and database capacity
-
         start_time = time.time()
         #createdat_db=datetime.datetime.today()
         chunks = chunk_data(data, chunk_size)
         tasks = [save_chunk(chunk,aware_datetime) for chunk in chunks]
         await asyncio.gather(*tasks)
         end_time = time.time()
-        
         print(f"Saving data took: {end_time - start_time} seconds")
         #code to normalize data in raw table 
         SQL_FILE_PATHS = os.getenv('SQL_FILE_PATHS')      
@@ -194,8 +179,6 @@ async def handle_api_data(request):
         return HttpResponse("Employee leave records have been successfully saved.")
     return HttpResponse('No post request')
 
-# @api_view(['GET', 'POST'])
-# @permission_classes([IsAuthenticated])
 @async_to_sync
 @login_required
 async def upload_file(request):
@@ -205,7 +188,7 @@ async def upload_file(request):
             file = request.FILES['file']
             data = handle_uploaded_file(file)
             # Define chunk size
-            chunk_size = 30000  # Adjust this size based on your needs and database capacity
+            chunk_size = 30000  
 
             start_time = time.time()
             chunks = chunk_data(data, chunk_size)
@@ -217,9 +200,7 @@ async def upload_file(request):
             await asyncio.gather(*tasks)
             end_time = time.time()
             print(f"Saving data took: {end_time - start_time} seconds")
-            
-            SQL_FILE_PATHS = os.getenv('SQL_FILE_PATHS')
-            
+            SQL_FILE_PATHS = os.getenv('SQL_FILE_PATHS') 
             file_paths_list = SQL_FILE_PATHS.split(',') # Convert the string into a list by splitting it by commas
             BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             print(BASE_DIR)
@@ -234,8 +215,7 @@ async def upload_file(request):
                 else:
                     return HttpResponse(f"SQL file not found: {file_name}", status=404)  
             sql_queries=[read_sql_file(file_path) for file_path in sql_scripts]
-            tasks = [call_stored_proc_async(sql_query, aware_datetime) for sql_query in sql_queries]
-            
+            tasks = [call_stored_proc_async(sql_query, aware_datetime) for sql_query in sql_queries]  
             await asyncio.gather(*tasks) # Run all tasks concurrently
             return HttpResponse("File has been uploaded and data saved successfully.")
     else:
@@ -244,7 +224,6 @@ async def upload_file(request):
         except:
             pass 
     return render(request, 'upload.html', {'form': form})
-
 
 def create_employee_leave_instance(item,createdat_db):
     return EmployeeLeave(

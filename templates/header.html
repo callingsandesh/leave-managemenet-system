@@ -1,17 +1,43 @@
 <!-- templates/header.html -->
 <header>
     <nav style="background-color: #333; padding: 10px; text-align: center;">
-        <a href="/dataupload/" style="color: #fff; margin: 0 15px; text-decoration: none;">Home</a>
-        <a href="/dataupload/upload/" style="color: #fff; margin: 0 15px; text-decoration: none;">Upload</a>
-        <a href="/dataupload/navigation/" style="color: #fff; margin: 0 15px; text-decoration: none;">API</a>
-        <a href="/visualizations/employee-count-by-designation-view/" style="color: #fff; margin: 0 15px; text-decoration: none;">Visualizations</a>
-        <a href="/visualizations/employees/" style="color: #fff; margin: 0 15px; text-decoration: none;">Employees</a>
-        <a href="/visualizations/d3_visualization/" style="color: #fff; margin: 0 15px; text-decoration: none;">D3 Visualization</a>
+        <a href="/api/v1/dataupload/" style="color: #fff; margin: 0 15px; text-decoration: none;">Home</a>
+        <a href="/api/v1/dataupload/upload/" style="color: #fff; margin: 0 15px; text-decoration: none;">Upload</a>
+        <a href="/api/v1/dataupload/navigation/" style="color: #fff; margin: 0 15px; text-decoration: none;">API</a>
+        <a href="/api/v1/visualizations/employee-count-by-designation-view/" style="color: #fff; margin: 0 15px; text-decoration: none;">Visualizations</a>
+        <a href="/api/v1/visualizations/employees/" style="color: #fff; margin: 0 15px; text-decoration: none;">Employees</a>
+        <a href="/api/v1/visualizations/d3_visualization/" style="color: #fff; margin: 0 15px; text-decoration: none;">D3 Visualization</a>
         {% if user.is_authenticated %}
-            <a href="/user/logout/" style="color: #fff; margin: 0 15px; text-decoration: none;">Logout</a>
+            <a href="/api/v1/user/logout/" style="color: #fff; margin: 0 15px; text-decoration: none;">Logout</a>
         {% else %}
-            <a href="/user/login/" style="color: #fff; margin: 0 15px; text-decoration: none;">Login</a>
+            <a href="/api/v1/user/login/" style="color: #fff; margin: 0 15px; text-decoration: none;">Login</a>
         {% endif %}
     </nav>
 </header>
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const token = getCookie('access');
+
+    function addAuthHeader(fetchOptions) {
+        if (!fetchOptions.headers) {
+            fetchOptions.headers = {};
+        }
+        fetchOptions.headers['Authorization'] = 'Bearer ' + token;
+        return fetchOptions;
+    }
+</script>
 

@@ -17,7 +17,13 @@
 - **.env.example**: The example of .env file
 - **utils**: Folder for utility scripts
 - **README.md**: Project README file
+- ***DockerFile**: File to setup the docker container
+- **docker-compose.yml**: File to run docker file and setup the insfrastructure 
 
+
+# Docker containerize the application
+ 1. docker-compose build
+ 2. docker-compose up
 
 
 # Getting Started with leave-management-system
