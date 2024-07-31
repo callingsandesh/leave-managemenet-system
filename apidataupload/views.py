@@ -179,8 +179,8 @@ async def handle_api_data(request):
         return HttpResponse("Employee leave records have been successfully saved.")
     return HttpResponse('No post request')
 
-@async_to_sync
 @login_required
+@async_to_sync
 async def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)

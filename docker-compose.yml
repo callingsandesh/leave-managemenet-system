@@ -14,16 +14,9 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_NAME=${DATABASE_NAME}
-      - DATABASE_USER=${DATABASE_USER}
-      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
       - DATABASE_HOST=db
-      - DATABASE_PORT=${DATABASE_PORT}
-      - API_URL=${API_URL}
-      - API_AUTHORIZATION=${API_AUTHORIZATION}
-      - SQL_FILE_PATHS=${SQL_FILE_PATHS}
-      - DEBUG=${DEBUG}
-      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+    env_file:
+      - ./.env
     depends_on:
       - db
     networks:
@@ -31,10 +24,8 @@ services:
 
   db:
     image: postgres:latest
-    environment:
-      POSTGRES_DB: leave_management
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
+    env_file:
+      - ./.env.postgres
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
