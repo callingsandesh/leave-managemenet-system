@@ -12,7 +12,7 @@ WORKDIR /app
 COPY requirements.txt /app/
 RUN apt-get update && \
     apt-get install -y cron && \
-    apt-get install -y gcc python3-dev build-essential && \
+    apt-get install -y gcc python3-dev build-essential libpq-dev && \
     pip install --upgrade pip && \
     pip install -r requirements.txt && \
     apt-get remove -y gcc python3-dev build-essential && \

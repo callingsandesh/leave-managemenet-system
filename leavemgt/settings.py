@@ -31,7 +31,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = ['127.0.0.1','localhost']
+ALLOWED_HOSTS = ['*']
 
 
 REST_FRAMEWORK = {
@@ -143,12 +143,12 @@ DATABASES = {
         'NAME': os.getenv('DATABASE_NAME'),
         'USER': os.getenv('DATABASE_USER'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
-        'HOST': os.getenv('DATABASE_HOST'),
+        'HOST': os.getenv('DATABASE_HOST','db'),
         'PORT': os.getenv('DATABASE_PORT'),
     }
 }
 
-
+print(f"Connecting to database: {os.getenv('DATABASE_NAME')}, User: {os.getenv('DATABASE_USER')}, Host: {os.getenv('DATABASE_HOST')}")
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

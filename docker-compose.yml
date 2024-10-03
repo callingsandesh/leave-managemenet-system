@@ -14,11 +14,8 @@ services:
       - .:/app 
     ports:
       - "8000:8000"
-    environment:
-      - DATABASE_HOST=db
-      - DATABASE_PORT=5432  # Set the custom port in the environment
     env_file:
-      - ./.env
+      - ./.env  # Load environment variables from .env
     depends_on:
       - db
     networks:
@@ -27,7 +24,7 @@ services:
   db:
     image: postgres:latest
     env_file:
-      - ./.env.postgres
+      - ./.env.postgres  # Load PostgreSQL-specific environment variables
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
