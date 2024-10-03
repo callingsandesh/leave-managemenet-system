@@ -97,7 +97,8 @@ OUR_APP = [
 
 
 THIRD_PARTY_APP = [
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    'django_crontab'
 ]
 
 INSTALLED_APPS = DEFAULT_APP + OUR_APP + THIRD_PARTY_APP
@@ -193,4 +194,48 @@ STATIC_ROOT=os.path.join(BASE_DIR,'static')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',  # Change to 'DEBUG' to capture more logs
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'app.log'),  # Log file will be created in the project root
+            'formatter': 'verbose',
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'leavemgt': {  # This is the name of your project
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
+
+CRONJOBS = [
+    ('*/1 * * * *', 'apidataupload.cron.print_hello'),
+    ('*/10 * * * *', 'apidataupload.cron.handle_api_data')
+
+    
+]
 

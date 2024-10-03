@@ -59,7 +59,7 @@ async def handle_api_data(request):
         timezone = pytz.timezone('Asia/Kathmandu')  # Set your desired timezone here
         aware_datetime = timezone.localize(createdat_db)
         # Define chunk size
-        chunk_size = 30000  # Adjust this size based on your needs and database capacity
+        chunk_size = int(os.getenv('CHUNK_SIZE'))
         start_time = time.time()
         #createdat_db=datetime.datetime.today()
         chunks = chunk_data(data, chunk_size)

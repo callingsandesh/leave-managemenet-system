@@ -46,7 +46,7 @@ This guide will walk you through the steps to create a new user and access the l
 from django.contrib.auth.models import User
 
 # Replace 'newuser', 'newuser@example.com', and 'password123' with your desired values
-user = User.objects.create_user(username='newuser', email='newuser@example.com', password='password123')
+user = User.objects.create_user(username='admin1', email='sandeshtimalsina1@lftechnology.com', password='admin')
 ```
 
 5.Verify that the user has been created successfully.
