@@ -11,6 +11,20 @@ import pytz
 from utils.utils_sql import read_sql_file
 from apidataupload.service import call_stored_proc_async,chunk_data,save_chunk,fetch_data_for_interval,generate_date_intervals,handle_uploaded_file
 
+from django.core.management.base import BaseCommand
+from datetime import datetime
+
+logger = logging.getLogger(__name__)
+
+class Command(BaseCommand):
+    help = 'Prints hello from cron job'
+
+    def handle(self, *args, **kwargs):
+        logger.info(f"Running at: {datetime.now()}, Environment: {os.environ}")
+        try:
+            print_hello()
+        except Exception as e:
+            logger.error(f"Error occurred: {e}")
 
 
 

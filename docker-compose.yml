@@ -6,10 +6,10 @@ services:
     command: >
       sh -c "if [ ! -f /app/db_initialized ]; then
                python manage.py migrate &&
-               python manage.py runcrons &&
+               python manage.py crontab add &&
                touch /app/db_initialized;
              fi &&
-             python manage.py runserver 0.0.0.0:8000"
+             cron && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app 
     ports:

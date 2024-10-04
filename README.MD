@@ -72,3 +72,11 @@ http://127.0.0.1:8000/user/login/
 
 5. You should now have access to the LEAVE-MANAGEMENT-SYSTEM application.
 
+
+## Check cron tab
+docker-compose exec web sh
+python manage.py shell 
+python manage.py crontab show
+python manage.py crontab add
+service cron status
+service cron start

@@ -23,5 +23,5 @@ RUN apt-get update && \
 # Copy the rest of the application code
 COPY . /app/
 
-# Set the default command to run the Django development server
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Set the default command to run both cron and the Django server
+CMD ["sh", "-c", "python manage.py migrate && python manage.py crontab add && cron && python manage.py runserver 0.0.0.0:8000"]

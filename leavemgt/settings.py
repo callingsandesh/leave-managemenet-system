@@ -97,6 +97,7 @@ OUR_APP = [
 
 
 THIRD_PARTY_APP = [
+    'rest_framework',
     'rest_framework_simplejwt',
     'django_crontab'
 ]
@@ -111,7 +112,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'user.middleware.JWTAuthMiddleware',
+    #'user.middleware.JWTAuthMiddleware',
 ]
 
 ROOT_URLCONF = 'leavemgt.urls'
@@ -224,7 +225,12 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
-        'leavemgt': {  # This is the name of your project
+        'leavemgt': {  
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },  
+        'apidataupload': {  
             'handlers': ['console', 'file'],
             'level': 'INFO',
             'propagate': True,
@@ -233,9 +239,11 @@ LOGGING = {
 }
 
 CRONJOBS = [
-    ('*/1 * * * *', 'apidataupload.cron.print_hello'),
-    ('*/10 * * * *', 'apidataupload.cron.handle_api_data')
-
-    
+    ('*/1 * * * *', 'DJANGO_SETTINGS_MODULE=myproject.settings /usr/local/bin/python /app/manage.py print_hello >> /app/print_hello.log 2>&1'),
+    ('*/10 * * * *', 'DJANGO_SETTINGS_MODULE=myproject.settings /usr/local/bin/python /app/manage.py handle_api_data >> /app/handle_api_data.log 2>&1')
 ]
+
+
+
+
 

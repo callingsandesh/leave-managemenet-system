@@ -6,7 +6,6 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from django.contrib.auth.models import AnonymousUser
 
-
 class JWTAuthMiddleware(MiddlewareMixin):
     def process_request(self, request):
         access_token = request.COOKIES.get('access')
