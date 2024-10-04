@@ -66,7 +66,7 @@ Quit the server with CONTROL-C.
 
 3. Open a web browser and go to the following link to access the login page:
 
-http://127.0.0.1:8000/user/login/
+http://0.0.0.0:8000/api/v1/user/login/
 
 4. Enter the username (newuser) and password (password123) you created earlier to log in.
 
@@ -75,7 +75,6 @@ http://127.0.0.1:8000/user/login/
 
 ## Check cron tab
 docker-compose exec web sh
-python manage.py shell 
 python manage.py crontab show
 python manage.py crontab add
 service cron status
